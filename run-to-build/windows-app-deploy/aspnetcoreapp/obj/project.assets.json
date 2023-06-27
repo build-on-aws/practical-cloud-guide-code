@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/sparaaws/github/aws/ITProContent2023/webapp/aspnetcoreapp/aspnetcoreapp.csproj",
+      "projectUniqueName": "/Users/sparaaws/github/aws/practical-cloud-guide-code/run-to-build/windows-app-deploy/aspnetcoreapp/aspnetcoreapp.csproj",
       "projectName": "aspnetcoreapp",
-      "projectPath": "/Users/sparaaws/github/aws/ITProContent2023/webapp/aspnetcoreapp/aspnetcoreapp.csproj",
+      "projectPath": "/Users/sparaaws/github/aws/practical-cloud-guide-code/run-to-build/windows-app-deploy/aspnetcoreapp/aspnetcoreapp.csproj",
       "packagesPath": "/Users/sparaaws/.nuget/packages/",
-      "outputPath": "/Users/sparaaws/github/aws/ITProContent2023/webapp/aspnetcoreapp/obj/",
+      "outputPath": "/Users/sparaaws/github/aws/practical-cloud-guide-code/run-to-build/windows-app-deploy/aspnetcoreapp/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/sparaaws/.nuget/NuGet/NuGet.Config"
