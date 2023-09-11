@@ -1,0 +1,173 @@
+# Usage from command line:
+#   aws cloudformation --region <YOUR-REGION> create-stack --stack-name <YOUR-STACK-NAME>- --template-body file://vpc-setup.yaml
+    Parameters:
+      InstanceTypeParameter:
+        Type: String
+        Default: t2.micro
+        Description: nter instance size. Default is t2.micro.
+      LatestAmiId:
+        Type:  'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+        Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+      BucketName:
+        Type: String
+        # Default: pcg-iam-role-bucket
+        Description: The name of the S3 Bucket to create
+    Resources:
+      ## VPC
+      PubPrivateVPC:
+        Type: AWS::EC2::VPC
+        Properties:
+          CidrBlock: 10.0.0.0/16
+
+      ## Subnets     
+      PublicSubnet1:
+        Type: AWS::EC2::Subnet
+        Properties:
+          VpcId: !Ref PubPrivateVPC
+          AvailabilityZone: us-east-1a
+          CidrBlock: 10.0.1.0/24
+          MapPublicIpOnLaunch: true
+     
+      PublicSubnet2:
+        Type: AWS::EC2::Subnet
+        Properties:
+          VpcId: !Ref PubPrivateVPC
+          AvailabilityZone: us-east-1b
+          CidrBlock: 10.0.2.0/24
+          MapPublicIpOnLaunch: true
+     
+      PrivateSubnet1:
+        Type: AWS::EC2::Subnet
+        Properties:
+          VpcId: !Ref PubPrivateVPC
+          AvailabilityZone: us-east-1a
+          CidrBlock: 10.0.3.0/24
+          MapPublicIpOnLaunch: false
+     
+      PrivateSubnet2:
+        Type: AWS::EC2::Subnet
+        Properties:
+          VpcId: !Ref PubPrivateVPC
+          AvailabilityZone: us-east-1b
+          CidrBlock: 10.0.4.0/24
+          MapPublicIpOnLaunch: false
+     
+     ## Internet Gateway
+      InternetGateway:
+        Type: AWS::EC2::InternetGateway
+      
+      GatewayToInternet:
+        Type: AWS::EC2::VPCGatewayAttachment
+        Properties:
+          VpcId: !Ref PubPrivateVPC
+          InternetGatewayId: !Ref InternetGateway
+      
+      ## Public Routing
+      PublicRouteTable:
+        Type: AWS::EC2::RouteTable
+        Properties:
+          VpcId: !Ref PubPrivateVPC
+      
+      PublicRoute:
+        Type: AWS::EC2::Route
+        DependsOn: GatewayToInternet
+        Properties:
+          RouteTableId: !Ref PublicRouteTable
+          DestinationCidrBlock: 0.0.0.0/0
+          GatewayId: !Ref InternetGateway
+     
+      PublicSubnet1RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+          SubnetId: !Ref PublicSubnet1
+          RouteTableId: !Ref PublicRouteTable
+     
+      PublicSubnet2RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+          SubnetId: !Ref PublicSubnet2
+          RouteTableId: !Ref PublicRouteTable
+     
+      ## NAT Gateway
+      NatGateway:
+        Type: AWS::EC2::NatGateway
+        DependsOn: NatPublicIP
+        Properties: 
+          SubnetId: !Ref PublicSubnet1
+          AllocationId: !GetAtt NatPublicIP.AllocationId
+
+      ## Elastic IP
+      NatPublicIP:
+        Type: AWS::EC2::EIP
+        DependsOn: PubPrivateVPC
+        Properties:
+          Domain: vpc
+     
+      ## Private Routing
+      PrivateRouteTable:
+        Type: AWS::EC2::RouteTable
+        Properties:
+          VpcId: !Ref PubPrivateVPC
+      
+      PrivateRoute:
+        Type: AWS::EC2::Route
+        Properties:
+          NatGatewayId: !Ref NatGateway
+          RouteTableId: !Ref PrivateRouteTable
+          DestinationCidrBlock: 0.0.0.0/0
+     
+      PrivateSubnet1RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+          SubnetId: !Ref PrivateSubnet1
+          RouteTableId: !Ref PrivateRouteTable
+     
+      PrivateSubnet2RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+          SubnetId: !Ref PrivateSubnet2
+          RouteTableId: !Ref PrivateRouteTable
+
+      PcgSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+          GroupDescription: This group will allow all  and SSH traffic
+          GroupName: AllowAllTraffic
+          SecurityGroupIngress:
+            - IpProtocol: tcp
+              FromPort: 22
+              ToPort: 22
+              CidrIp: 0.0.0.0/0
+
+      PcgInstance:
+        Type: AWS::EC2::Instance
+        Properties:
+          # KeyName: 'MyKeyPair'
+          ImageId: !Ref 'LatestAmiId'
+          InstanceType: 
+            Ref: InstanceTypeParameter
+          SecurityGroups:
+            [Ref: "PcgSecurityGroup"]
+
+      S3Bucket:
+        Type: 'AWS::S3::Bucket'
+        Description: Creating Amazon S3 bucket from CloudFormation
+        Properties:
+          BucketName: !Ref BucketName
+          AccessControl: Private
+          PublicAccessBlockConfiguration:
+            BlockPublicAcls: true
+            BlockPublicPolicy: true
+            IgnorePublicAcls: true
+            RestrictPublicBuckets: true
+    
+    Outputs:
+      outputPcgSecurityGroup:
+        Description: A reference to the created security group
+        Value: !Ref PcgSecurityGroup
+      outputPcgInstance:
+        Description: A reference to the created EC2 Instance
+        Value: !Ref PcgInstance
+      outputBucket:
+        Description: S3 Bucket Name
+        Value: !Ref S3Bucket
