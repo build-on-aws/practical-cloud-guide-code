@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "0xSKDW8aRp97Vz4j5E1B9BWCnUH5ict4tjc7T59kWKzHldupsbGycn0obDz5fHgcFQF0JXwRdYUxjFZS6pGH4g==",
+  "dgSpecHash": "bw7WbcAzrLlPj7V0eETzXghJrrbkUeb6US0rd/2DwojqsC65pSl+lhvbqcN6v4btiCFeTXZ6cMrijUvJUMmdhg==",
   "success": true,
-  "projectFilePath": "/Users/sparaaws/github/aws/ITProContent2023/webapp/aspnetcoreapp/aspnetcoreapp.csproj",
+  "projectFilePath": "/Users/sparaaws/github/aws/practical-cloud-guide-code/run-to-build/windows-app-deploy/aspnetcoreapp/aspnetcoreapp.csproj",
   "expectedPackageFiles": [
     "/Users/sparaaws/.nuget/packages/microsoft.netcore.app.ref/6.0.12/microsoft.netcore.app.ref.6.0.12.nupkg.sha512",
     "/Users/sparaaws/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.12/microsoft.aspnetcore.app.ref.6.0.12.nupkg.sha512",

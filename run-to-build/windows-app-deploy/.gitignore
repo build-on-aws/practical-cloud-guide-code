@@ -14,8 +14,6 @@
 
 # macOS General
 .DS_Store
-.vscode
-.vs
 .AppleDouble
 .LSOverride
 
@@ -109,3 +107,6 @@ xcuserdata/
 ## Xcode 8 and earlier
 *.xcscmblueprint
 *.xccheckout
+
+
+

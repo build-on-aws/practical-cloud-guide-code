@@ -11,29 +11,32 @@ net stop was /y
 net start w3svc
 
 # download and unzip the application
-$YourBucketName = "practical-cloud-guide-3"
+$YourBucketName = "<my>-practical-cloud-guide"
 $AppKey = "app.zip"
-New-Item -Path 'c:\inet\newsite' -ItemType Directory
-Copy-S3Object -BucketName $YourBucketName -Key $AppKey -LocalFile C:\inet\newsite\$AppKey
-Expand-Archive C:\inet\newsite\$AppKey -DestinationPath C:\inet\newsite  
+New-Item -Path "C:\inet\newsite" -ItemType Directory
+$AppFile = "C:\inet\newsite\" + $AppKey
+Copy-S3Object -BucketName $YourBucketName -Key $AppKey -LocalFile $AppFile
+Expand-Archive $AppFile -DestinationPath "C:\inet\newsite"
 
 # disable default application poot and application
 Stop-WebAppPool -Name "DefaultAppPool"
 Stop-WebSite -Name "Default Web Site"
 
 # create application pool
-$appPoolName = 'DemoAppPool'
+$appPoolName = "DemoAppPool"
 New-WebAppPool -Name $appPoolName -force
 
-New-Item IIS:\Sites\DemoSite -physicalPath C:\inet -bindings @{protocol="http";bindingInformation=":8080:"}
+New-Item IIS:\Sites\DemoSite -physicalPath "C:\inet" -bindings @{protocol="http";bindingInformation=":8080:"}
 Set-ItemProperty IIS:\Sites\DemoSite -name applicationPool -value $appPoolName
-New-Item IIS:\Sites\DemoSite\DemoApp -physicalPath C:\inet\newsite -type Application
+New-Item IIS:\Sites\DemoSite\DemoApp -physicalPath "C:\inet\newsite" -type Application
 Set-ItemProperty IIS:\sites\DemoSite\DemoApp -name applicationPool -value $appPoolName
 
 # start new website
 Start-WebAppPool -Name $appPoolName
 Start-WebSite -Name "DemoSite"
 
-
 # open Edge
 start microsoft-edge:http://localhost:8080/DemoApp
+
+# remove AWS credentials
+Remove-AWSCredentialProfile -ProfileName default
