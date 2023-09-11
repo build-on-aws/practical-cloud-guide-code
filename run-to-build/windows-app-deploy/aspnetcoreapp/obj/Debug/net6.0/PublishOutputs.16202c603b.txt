@@ -1,0 +1,7 @@
+/Users/sparaaws/github/aws/ITProContent2023/webapp/aspnetcoreapp/bin/Debug/net6.0/publish/aspnetcoreapp
+/Users/sparaaws/github/aws/ITProContent2023/webapp/aspnetcoreapp/bin/Debug/net6.0/publish/appsettings.Development.json
+/Users/sparaaws/github/aws/ITProContent2023/webapp/aspnetcoreapp/bin/Debug/net6.0/publish/appsettings.json
+/Users/sparaaws/github/aws/ITProContent2023/webapp/aspnetcoreapp/bin/Debug/net6.0/publish/aspnetcoreapp.dll
+/Users/sparaaws/github/aws/ITProContent2023/webapp/aspnetcoreapp/bin/Debug/net6.0/publish/aspnetcoreapp.deps.json
+/Users/sparaaws/github/aws/ITProContent2023/webapp/aspnetcoreapp/bin/Debug/net6.0/publish/aspnetcoreapp.runtimeconfig.json
+/Users/sparaaws/github/aws/ITProContent2023/webapp/aspnetcoreapp/bin/Debug/net6.0/publish/aspnetcoreapp.pdb
