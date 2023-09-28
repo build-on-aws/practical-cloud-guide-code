@@ -36,22 +36,6 @@
           CidrBlock: 10.0.2.0/24
           MapPublicIpOnLaunch: true
      
-      PrivateSubnet1:
-        Type: AWS::EC2::Subnet
-        Properties:
-          VpcId: !Ref PubPrivateVPC
-          AvailabilityZone: us-east-1a
-          CidrBlock: 10.0.3.0/24
-          MapPublicIpOnLaunch: false
-     
-      PrivateSubnet2:
-        Type: AWS::EC2::Subnet
-        Properties:
-          VpcId: !Ref PubPrivateVPC
-          AvailabilityZone: us-east-1b
-          CidrBlock: 10.0.4.0/24
-          MapPublicIpOnLaunch: false
-     
      ## Internet Gateway
       InternetGateway:
         Type: AWS::EC2::InternetGateway
@@ -87,14 +71,6 @@
         Properties:
           SubnetId: !Ref PublicSubnet2
           RouteTableId: !Ref PublicRouteTable
-     
-      ## NAT Gateway
-      NatGateway:
-        Type: AWS::EC2::NatGateway
-        DependsOn: NatPublicIP
-        Properties: 
-          SubnetId: !Ref PublicSubnet1
-          AllocationId: !GetAtt NatPublicIP.AllocationId
 
       ## Elastic IP
       NatPublicIP:
@@ -102,31 +78,6 @@
         DependsOn: PubPrivateVPC
         Properties:
           Domain: vpc
-     
-      ## Private Routing
-      PrivateRouteTable:
-        Type: AWS::EC2::RouteTable
-        Properties:
-          VpcId: !Ref PubPrivateVPC
-      
-      PrivateRoute:
-        Type: AWS::EC2::Route
-        Properties:
-          NatGatewayId: !Ref NatGateway
-          RouteTableId: !Ref PrivateRouteTable
-          DestinationCidrBlock: 0.0.0.0/0
-     
-      PrivateSubnet1RouteTableAssociation:
-        Type: AWS::EC2::SubnetRouteTableAssociation
-        Properties:
-          SubnetId: !Ref PrivateSubnet1
-          RouteTableId: !Ref PrivateRouteTable
-     
-      PrivateSubnet2RouteTableAssociation:
-        Type: AWS::EC2::SubnetRouteTableAssociation
-        Properties:
-          SubnetId: !Ref PrivateSubnet2
-          RouteTableId: !Ref PrivateRouteTable
 
       PcgSecurityGroup:
         Type: AWS::EC2::SecurityGroup
@@ -138,6 +89,7 @@
               FromPort: 22
               ToPort: 22
               CidrIp: 0.0.0.0/0
+          VpcId: !Ref PubPrivateVPC
 
       PcgInstance:
         Type: AWS::EC2::Instance
@@ -146,8 +98,9 @@
           ImageId: !Ref 'LatestAmiId'
           InstanceType: 
             Ref: InstanceTypeParameter
-          SecurityGroups:
-            [Ref: "PcgSecurityGroup"]
+          SecurityGroupIds:
+            - !Ref PcgSecurityGroup
+          SubnetId: !Ref PublicSubnet1
 
       S3Bucket:
         Type: 'AWS::S3::Bucket'
